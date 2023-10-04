@@ -21,6 +21,8 @@ public class MainActivity extends AppCompatActivity
 
     ArrayList<User> userList;
 
+    DatabaseHelper dbHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,15 @@ public class MainActivity extends AppCompatActivity
         lv_j_users = findViewById(R.id.lv_v_users);
 
         userList = new ArrayList<User>();
+        //Make an instance of the databaseHelper and pass it this
+        dbHelper = new DatabaseHelper(this);
+        //call the initializeDB() function to fill the records into our table
+        dbHelper.initializeDB();
+        //test to make sure the records were inserted
+        //we should see 4 when we run this
+        Log.d("Number of records: ", dbHelper.numOfRowsInTable() + "");
+        userList = dbHelper.getAllRows();
+        displayUsers();
 
         addNewUserButtonEvent();
     }
@@ -49,7 +60,7 @@ public class MainActivity extends AppCompatActivity
                 String f = et_j_fName.getText().toString();
                 String l = et_j_lName.getText().toString();
 
-                User user = new User(u,l,f);
+                User user = new User(u,f,l);
 
                 addNewUser(user);
 

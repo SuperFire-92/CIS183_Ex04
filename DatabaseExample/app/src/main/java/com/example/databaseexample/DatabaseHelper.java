@@ -135,4 +135,65 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
         return listUsers;
     }
+
+    public void addNewUser(User u)
+    {
+        //get an instance of a writable database
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        //This line is a little complicated. The sql statement should look as follows:
+        //INSERT INTO Users VALUES('zmoore','Zack','Moore');
+
+        db.execSQL("INSERT INTO " + TABLE_NAME + " VALUES('" + u.getuName() + "','" + u.getfName() + "','" + u.getlName() + "');");
+    }
+
+    //When making the getColumnIndex, must supress range
+    @SuppressLint("Range")
+    public ArrayList<String> getAllUsernames()
+    {
+        ArrayList<String> usernames = new ArrayList<String>();
+
+        //Query to get all usernames from table
+        String selectUserNames = "SELECT username FROM " + TABLE_NAME + ";";
+        //Get instance of a readable database and store in db
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        //Execute the query. Cursor will be used to cycle results
+        Cursor cursor = db.rawQuery(selectUserNames, null);
+
+        String username;
+
+        //If there was something returned move the cursor to the beginning of the list
+        if (cursor.moveToFirst())
+        {
+            do {
+                username = cursor.getString(cursor.getColumnIndex("username"));
+
+                usernames.add(username);
+            } while (cursor.moveToNext());
+        }
+
+        //MUST CLOSE DATABASE
+        db.close();
+
+        return usernames;
+    }
+
+    //used to delete a specific user
+    //this will be passed a username because it is our primary key
+    //you MUST delete off the primary key
+    public void deleteUser(String uName)
+    {
+        //get an instance of our database
+        //needs to be writable
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        //create our delete command
+        //DELETE FROM Users WHERE username = 'zmoor';
+        db.execSQL("DELETE FROM " + TABLE_NAME + " WHERE username = '" + uName + "';");
+
+        //close the database
+        db.close();
+    }
 }

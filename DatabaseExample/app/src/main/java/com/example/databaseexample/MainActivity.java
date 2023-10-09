@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -22,6 +24,9 @@ public class MainActivity extends AppCompatActivity
     ArrayList<User> userList;
 
     DatabaseHelper dbHelper;
+
+    ArrayList<String> usernames;
+    ArrayAdapter<String> adapter;
 
 
     @Override
@@ -44,9 +49,24 @@ public class MainActivity extends AppCompatActivity
         //we should see 4 when we run this
         Log.d("Number of records: ", dbHelper.numOfRowsInTable() + "");
         userList = dbHelper.getAllRows();
-        displayUsers();
+
+
+
+        //for testing purposes only
+        //displayUsers();
+
+        //get all usernames from our table
+        usernames = dbHelper.getAllUsernames();
+
+        //Remember that this is a simple menu. Meaning that you can only display one string per cell.
+        //If you want to display multiple things in a cell, you need a custom adapter and custom cell.
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, usernames);
+
+        //tell the listview to use the adapter
+        lv_j_users.setAdapter(adapter);
 
         addNewUserButtonEvent();
+        deleteUserEvent();
     }
 
     public void addNewUserButtonEvent()
@@ -62,9 +82,24 @@ public class MainActivity extends AppCompatActivity
 
                 User user = new User(u,f,l);
 
+                //Adding user to the database and arraylist
                 addNewUser(user);
 
-                displayUsers();
+                //add the username to the username arraylist
+                usernames.add(u);
+
+                //this line is easily forgotten.  You need this line to so the listview will reflect the new
+                //user based off the new username added to the usernames arraylist
+                adapter.notifyDataSetChanged();
+
+                //This is for testing only
+                //displayUsers();
+
+
+                //Clear textboxes
+                et_j_fName.setText("");
+                et_j_lName.setText("");
+                et_j_uName.setText("");
 
                 //Add to database
                 //Save to an arraylist
@@ -76,7 +111,10 @@ public class MainActivity extends AppCompatActivity
 
     public void addNewUser(User u)
     {
+        //Add user to the arraylist
         userList.add(u);
+        //Add user to the database
+        dbHelper.addNewUser(u);
     }
 
     public void displayUsers()
@@ -85,5 +123,24 @@ public class MainActivity extends AppCompatActivity
         {
             Log.d("User: ",userList.get(i).getfName());
         }
+    }
+
+    public void deleteUserEvent()
+    {
+        lv_j_users.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //call the delete function in our dbHelper
+                dbHelper.deleteUser(usernames.get(i));
+                //remove the user from the userList
+                userList.remove(i);
+                //remove the user from the usernames
+                usernames.remove(i);
+                //update the listview to see the changes
+                adapter.notifyDataSetChanged();
+
+                return false;
+            }
+        });
     }
 }

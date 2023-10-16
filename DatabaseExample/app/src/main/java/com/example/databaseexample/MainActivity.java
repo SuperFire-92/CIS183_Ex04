@@ -1,7 +1,9 @@
 package com.example.databaseexample;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity
 
     ArrayList<String> usernames;
     ArrayAdapter<String> adapter;
+    Intent updateIntent;
 
 
     @Override
@@ -39,6 +42,8 @@ public class MainActivity extends AppCompatActivity
         et_j_uName = findViewById(R.id.et_v_uName);
         btn_j_addUser = findViewById(R.id.btn_v_addUser);
         lv_j_users = findViewById(R.id.lv_v_users);
+
+        updateIntent = new Intent(MainActivity.this, Update.class);
 
         userList = new ArrayList<User>();
         //Make an instance of the databaseHelper and pass it this
@@ -67,6 +72,7 @@ public class MainActivity extends AppCompatActivity
 
         addNewUserButtonEvent();
         deleteUserEvent();
+        updateUserEvent();
     }
 
     public void addNewUserButtonEvent()
@@ -140,6 +146,18 @@ public class MainActivity extends AppCompatActivity
                 adapter.notifyDataSetChanged();
 
                 return false;
+            }
+        });
+    }
+
+    public void updateUserEvent()
+    {
+        lv_j_users.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                updateIntent.putExtra("User", userList.get(i));
+                Log.d("--info--",userList.get(i).getuName() + " " + userList.get(i).getfName());
+                startActivity(updateIntent);
             }
         });
     }

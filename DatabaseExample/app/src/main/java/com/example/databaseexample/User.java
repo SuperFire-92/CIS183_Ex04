@@ -1,6 +1,9 @@
 package com.example.databaseexample;
 
-public class User
+import java.io.Serializable;
+
+//Serializable allows the class to move to different intents
+public class User implements Serializable
 {
     private String fName;
     private String lName;
